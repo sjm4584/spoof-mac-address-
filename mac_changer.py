@@ -27,7 +27,7 @@ def localifs():
     Returns:
         List of interface tuples.  Each tuple consists of
         (interface name, interface IP)
-    curtiousy of: https://code.activestate.com/recipes/439093-get-names-of-all-up-network-interfaces-linux-only/
+    courtesy of: https://code.activestate.com/recipes/439093-get-names-of-all-up-network-interfaces-linux-only/
     """
     global SIOCGIFCONF
     global MAXBYTES
