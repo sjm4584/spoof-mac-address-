@@ -18,7 +18,8 @@ from uuid import getnode as get_mac
 SIOCGIFCONF = 0x8912
 MAXBYTES = 8096
 
-#Gets all current interfaces. Not really needed but neat code
+
+# gets all current interfaces. Not really needed but neat code
 def localifs():
     """
     Used to get a list of the up interfaces and associated IP addresses
@@ -27,7 +28,6 @@ def localifs():
     Returns:
         List of interface tuples.  Each tuple consists of
         (interface name, interface IP)
-    courtesy of: https://code.activestate.com/recipes/439093-get-names-of-all-up-network-interfaces-linux-only/
     """
     global SIOCGIFCONF
     global MAXBYTES
@@ -55,32 +55,32 @@ def localifs():
         ))[0]
 
     namestr = names.tostring()
-    return [(namestr[i:i+var1].split('\0', 1)[0], \
-            socket.inet_ntoa(namestr[i+20:i+24])) \
+    return [(namestr[i:i+var1].split('\0', 1)[0],
+            socket.inet_ntoa(namestr[i+20:i+24]))
             for i in xrange(0, outbytes, var2)]
 
-#Get MAC address of a given interface in octet form
+
+# get MAC address of a given interface in octet form
 def get_mac(interface):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    info = fcntl.ioctl(s.fileno(), 0x8927,  \
-            struct.pack('256s', interface[:15]))
+    info = fcntl.ioctl(s.fileno(), 0x8927, struct.pack('256s', interface[:15]))
     return ''.join(['%02x:' % ord(char) for char in info[18:24]])[:-1]
 
-#Generates and changes the MAC address using ip command
+
+# generates and changes the MAC address using ip command
 def change_mac(interface, mac):
     mac = mac[:9]
     seed = "abcdef0123456789"
-    mac +=':'.join(\
+    mac += ':'.join(
         [random.choice(seed) + random.choice(seed) for _ in range(3)])
-    process = subprocess.Popen('ip link set %s down' %(interface), \
-                shell=True, stdout=subprocess.PIPE)
-    process = subprocess.Popen('ip link set %s address %s' %(interface, \
-                mac), shell=True, stdout=subprocess.PIPE)
-    process = subprocess.Popen('ip link set %s up' %(interface), \
-                shell=True, stdout=subprocess.PIPE)
+    process = subprocess.Popen('ip link set %s down' % (interface),
+                               shell=True, stdout=subprocess.PIPE)
+    process = subprocess.Popen('ip link set %s address %s' % (interface,
+                               mac), shell=True, stdout=subprocess.PIPE)
+    process = subprocess.Popen('ip link set %s up' % (interface),
+                               shell=True, stdout=subprocess.PIPE)
     process.wait()
-    
-    print "[+] New MAC Address is: ", mac    
+    print "[+] New MAC Address is: ", mac
 
     return process.returncode
 
@@ -90,7 +90,7 @@ def main():
     parser.add_argument(
         '-int', '--interface', type=str, help='interface to change')
     parser.add_argument(
-        '-ls', '--list', help='list available interfaces',\
+        '-ls', '--list', help='list available interfaces',
         action='store_true')
     args = parser.parse_args()
 
@@ -103,7 +103,7 @@ def main():
         mac = {}
         for i in range(0, len(interfaces)):
             print interfaces[i][0], ":", get_mac(interfaces[i][0]), ":", \
-                    interfaces[i][1]
+                interfaces[i][1]
         exit()
 
     mac = get_mac(args.interface)
